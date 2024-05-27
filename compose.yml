@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: "postgres:16.3-alpine"
+    environment:
+      POSTGRES_PASSWORD: user
+      POSTGRES_USER: user
+      POSTGRES_DB: ai-explore
+    volumes: 
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

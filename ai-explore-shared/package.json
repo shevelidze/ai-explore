@@ -1,0 +1,19 @@
+{
+  "name": "ai-explore-shared",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "rm -rf dist && tsc && cp package.json dist"
+  },
+  "dependencies": {
+    "js-tiktoken": "^1.0.12",
+    "openai": "3.3.0",
+    "pg": "^8.11.5",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
