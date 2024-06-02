@@ -18,7 +18,7 @@ export default async function Search({ searchParams }: ServerComponentProps) {
 
   return (
     <div className="flex justify-center px-5 py-16">
-      <div className="max-w-[800px]">
+      <div className="max-w-[800px] flex-shrink min-w-0">
         <div className="flex justify-center mb-5">
           <Link href="/">
             <Image src={logo} alt="logo" />

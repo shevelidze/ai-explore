@@ -51,7 +51,7 @@ const SearchField: React.FC<Props> = ({ className, ...props }) => {
   return (
     <div
       className={classNames(
-        'h-12 bg-space-white flex items-center gap-4 px-3 rounded-md',
+        'h-12 bg-space-white flex items-center gap-4 px-3 rounded-md flex-shrink-0',
         className
       )}
     >
@@ -62,9 +62,13 @@ const SearchField: React.FC<Props> = ({ className, ...props }) => {
         onKeyDown={onInputKeyDown}
         value={searchQuery}
         type="text"
-        className="h-full bg-transparent flex-grow text-space-black text-xl focus:outline-none placeholder:text-space-gray"
+        className="h-full bg-transparent flex-grow text-space-black text-xl focus:outline-none placeholder:text-space-gray min-w-0 flex-shrink"
       />
-      <button type="button" onClick={onSearchButtonClick}>
+      <button
+        type="button"
+        onClick={onSearchButtonClick}
+        className="flex-shrink-0"
+      >
         {isLoading ? (
           <Spinner className="text-3xl text-space-blue-default" />
         ) : (
