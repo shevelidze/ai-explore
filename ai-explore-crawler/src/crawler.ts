@@ -23,7 +23,7 @@ class Crawler {
       process.env.DATABASE_URL as string
     );
     this.textEmbeddingService = new TextEmbeddingService(
-      process.env.OPENAI_API_KEY as string
+      process.env.OPEN_AI_API_KEY as string
     );
 
     this.queue = new PQueue({ concurrency: CRAWLING_CONCURRENCY_LIMIT });
@@ -78,27 +78,17 @@ class Crawler {
         throw new GetPageDataError('Empty text');
       }
 
-      const index = this.getPineconeIndex();
-      const namespaceName = this.getPageNamespaceName(pageId);
-      const namespace = index.namespace(namespaceName);
-
-      const indexStats = await index.describeIndexStats();
-
-      if (
-        indexStats.namespaces &&
-        indexStats.namespaces.hasOwnProperty(namespaceName)
-      ) {
-        await namespace.deleteAll();
-      }
+      await this.clearPageInPinecone(pageId);
 
       const embeddings = await this.textEmbeddingService.createEmbedding(
         chunks
       );
 
-      await namespace.upsert(
+      const index = this.getPineconeIndex();
+      await index.upsert(
         embeddings.map((embedding, index) => {
           return {
-            id: this.getEmbeddingId(pageId, index),
+            id: this.getIdForPinecone(pageId, index),
             values: embedding,
           };
         })
@@ -144,12 +134,28 @@ class Crawler {
     return this.pinecone.index(process.env.PINECONE_INDEX_NAME as string);
   }
 
-  private getPageNamespaceName(pageId: number) {
-    return `page-${pageId}`;
+  private async clearPageInPinecone(pageId: number) {
+    const index = this.getPineconeIndex();
+
+    const recordsToClear = await index.listPaginated({
+      prefix: this.getPageIdPrefixForPinecone(pageId),
+    });
+
+    const vectorsIds = recordsToClear.vectors?.map((record) => record.id) ?? [];
+
+    if (vectorsIds.length === 0) {
+      return;
+    }
+
+    await index.deleteMany(vectorsIds);
   }
 
-  private getEmbeddingId(pageId: number, chunkIndex: number) {
-    return `${pageId}-${chunkIndex}`;
+  private getIdForPinecone(pageId: number, chunkIndex: number) {
+    return this.getPageIdPrefixForPinecone(pageId) + chunkIndex;
+  }
+
+  private getPageIdPrefixForPinecone(pageId: number) {
+    return `page${pageId}#`;
   }
 
   private async getPageData(url: string): Promise<PageData> {

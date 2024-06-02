@@ -8,6 +8,7 @@ class AiExploreRepository {
     this.sequelize = new Sequelize(databaseUrl, {
       dialect: 'postgres',
       logging,
+      dialectModule: require('pg'),
     });
 
     this.pagesModel = definePagesModel(this.sequelize);
@@ -93,8 +94,18 @@ class AiExploreRepository {
     );
   }
 
-  public getPage(pageId: number) {
-    return this.pagesModel.findByPk(pageId);
+  public async getPagesByIds(pagesIds: number[]) {
+    const entries = await this.pagesModel.findAll({
+      where: {
+        id: pagesIds,
+      },
+    });
+
+    return entries.map((entry) =>
+      entry.get({
+        plain: true,
+      })
+    );
   }
 
   private getRecrawlingThresholdDate() {
