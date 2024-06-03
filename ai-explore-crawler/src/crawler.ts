@@ -2,7 +2,6 @@ import 'dotenv/config';
 import PQueue from 'p-queue';
 import { AiExploreRepository } from 'ai-explore-shared/repositories/ai-explore';
 import { tokenizer } from 'ai-explore-shared/utils/tokenizer';
-import { EMBEDDING_MODEL_LIMIT } from 'ai-explore-shared/constants/embedding-model-limit';
 import { TextEmbeddingService } from 'ai-explore-shared/services/text-embedding';
 import { PageData } from './types/page-data';
 import { PageParser } from './page-parser';
@@ -68,8 +67,8 @@ class Crawler {
       const tokenizedText = tokenizer.encode(pageData.text);
       const tokenizedChunks = splitIntoOverlappingChunks(
         tokenizedText,
-        EMBEDDING_MODEL_LIMIT,
-        200
+        256,
+        100
       );
 
       const chunks = tokenizedChunks.map((chunk) => tokenizer.decode(chunk));
